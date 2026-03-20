@@ -1,171 +1,219 @@
-# Job Simulator — REST CRUD API
+# Cars API
 
-## Descripción
-
-Se requiere construir una API REST con operaciones CRUD completas, persistencia en base de datos relacional y entorno containerizado. El dominio del recurso queda a criterio del desarrollador.
-
-El sistema será consumido por un cliente frontend ya existente. La API debe cumplir el contrato definido en este documento de forma exacta. Cualquier desviación del contrato se considera un fallo de integración.
-
----
-
-## Condiciones de trabajo
-
-Eres un desarrollador backend contratado para entregar un sistema funcional en un tiempo determinado. El pago se acredita únicamente si el sistema es entregado en tiempo y cumple el contrato en su totalidad.
-
-Las siguientes condiciones resultan en terminación del contrato sin compensación parcial:
-
-- El repositorio contiene archivos que no deben ser versionados (`node_modules`, `vendor`, `.env`, binarios, archivos de sistema operativo)
-
-- Entrega fuera del plazo establecido
-- El sistema no levanta con un único comando
-- Algún endpoint no responde o responde de forma incorrecta
-- Los códigos de respuesta HTTP no son los correctos según el estándar REST
-- Las validaciones no están implementadas
-- Los tipos de datos no son respetados
-- Las respuestas no son JSON
-- Almacenamiento en memoria en lugar de base de datos relacional
-- El API no interactua de forma correcta con el frontend.
-
-El nivel de contratación determina el máximo de compensación posible. No existe compensación parcial dentro de un nivel.
-
----
-
-## Contrato de la API
-
-### Estructura del recurso
-
-El recurso expone los siguientes campos con nombres fijos:
-
-| Campo  | Tipo    | Restricciones              |
-| ------ | ------- | -------------------------- |
-| id     | integer | primary key, autoincrement |
-| campo1 | string  | requerido                  |
-| campo2 | string  | requerido                  |
-| campo3 | string  | requerido                  |
-| campo4 | integer | requerido                  |
-| campo5 | float   | requerido                  |
-| campo6 | boolean | requerido                  |
-
-El dominio es libre. Los nombres internos en base de datos y lógica de negocio quedan a criterio del desarrollador.
-
----
-
-### Endpoints
-
-Se requiere implementar los métodos `GET`, `POST`, `PUT` y `DELETE`. El nombre del recurso en la ruta debe seguir las convenciones REST estándar.
-
----
-
-### Validaciones
-
-Todos los campos son requeridos. Los tipos deben ser respetados estrictamente: `campo4` es entero, `campo5` es decimal, `campo6` es booleano.
-
----
-
-### Códigos de respuesta
-
-El uso correcto de códigos HTTP es parte del contrato con el cliente. Todas las respuestas son JSON.
+API REST CRUD construida con Node.js, Express y PostgreSQL, completamente containerizada con Docker. El dominio del recurso es el universo de la película **Cars** — cada registro representa un corredor con su información de competencia.
 
 ---
 
 ## Stack
 
-- Lenguaje: Javascript, PHP o Rust — no se aceptan Go ni Python
-- Base de datos: relacional, sin almacenamiento en memoria
-- Containerización: Docker obligatorio
-
-En la carpeta `resources/` se incluyen Dockerfiles de referencia para cada lenguaje y base de datos, y un `.env.example`.
-
----
-
-## Niveles de contratación
-
-La evaluación es **pasa o no pasa**. Indicar el nivel seleccionado al momento de la entrega.
+| Capa | Tecnología |
+|---|---|
+| Runtime | Node.js 20 Alpine |
+| Framework | Express 4 |
+| Base de datos | PostgreSQL 16 Alpine |
+| Driver DB | pg (node-postgres) |
+| Servidor estático | Nginx Alpine |
+| Containerización | Docker + Docker Compose |
 
 ---
 
-### Nivel 1 — Junior `(máximo 70/100)`
+## Requisitos previos
 
-**Base de datos:** SQLite
-
-**Infraestructura:** `docker-compose.yml` con un único servicio. La base de datos corre embebida dentro del mismo contenedor que la aplicación. `docker-compose up` debe levantar el sistema completo y funcional sin intervención manual.
-
-**Requisitos:**
-- Los cinco endpoints funcionan correctamente contra la base de datos
-- Todas las validaciones están implementadas y retornan los códigos HTTP correspondientes
-- La base de datos persiste los datos correctamente entre operaciones
-- `Dockerfile` y `docker-compose.yml` presentes y funcionales
+- Docker Desktop instalado y corriendo
+- Puertos `8080` y `8088` disponibles
 
 ---
 
-### Nivel 2 — Mid `(máximo 85/100)`
+## Levantar el sistema
 
-**Base de datos:** PostgreSQL
-
-**Infraestructura:** `docker-compose.yml` con dos servicios independientes: aplicación y base de datos. La aplicación debe conectarse a PostgreSQL usando variables de entorno. Un único `docker-compose up` levanta el sistema completo y funcional.
-
-**Requisitos adicionales al Nivel 1:**
-- Archivo `.env` con todas las variables de configuración necesarias
-- Sin credenciales, puertos ni strings de conexión hardcodeados en el código
-- La aplicación maneja correctamente los errores de conexión a la base de datos
-- El servicio de la aplicación no inicia hasta que PostgreSQL esté disponible
-
----
-
-### Nivel 3 — Senior `(máximo 100/100)`
-
-**Base de datos:** PostgreSQL
-
-**Infraestructura:** igual que Nivel 2.
-
-**Requisitos adicionales al Nivel 2:**
-- Endpoint `PATCH` para actualizaciones parciales: solo se modifican los campos presentes en el body, el resto permanece sin cambios
-- `.env.example` en el repositorio con todas las variables necesarias documentadas, sin valores reales
-- `.gitignore` que excluya `node_modules`, `.env`, y archivos de sistema operativo
-- Script SQL de inicialización de esquema ejecutado automáticamente por Docker al primer arranque
-- Estructura de proyecto con separación clara de responsabilidades: configuración de base de datos, definición de rutas y punto de entrada en archivos distintos
-- Historial de commits que refleje un proceso de desarrollo incremental — no se acepta un único commit con todo el trabajo
-
----
-
-## Bonus
-
-Los puntos bonus se suman sobre la nota del nivel entregado. Cada bonus se evalúa de forma independiente.
-
-### Integración full stack `(+10 puntos)`
-
-Integrar el frontend provisto en el mismo `docker-compose.yml` que la API.
-
-Condiciones:
-- Un único `docker-compose.yml` levanta ambos servicios
-- El frontend consume la API sin configuración manual posterior al `docker-compose up`
-- Ambos servicios operativos con un solo comando
-
-### Personalización del frontend `(+5 puntos)`
-
-Adaptar el frontend para que refleje el dominio elegido: etiquetas en el idioma correcto, nombres de campos legibles, y cualquier ajuste visual que mejore la experiencia del usuario final.
-
-Condiciones:
-- El frontend no debe mostrar `campo1`, `campo2`, etc. — deben verse los nombres reales del dominio
-- Los cambios deben ser coherentes con el recurso implementado en la API
-- Aplica únicamente si el bonus de integración también fue completado
-
----
-
-## Configuración del frontend
-
-El frontend provisto requiere dos valores en `public/js/config.js`:
-
-```js
-window.API_URL = "http://localhost:8080"; // URL base de tu API
-window.RESOURCE = "products";             // Nombre del recurso en tu API
+```bash
+git clone <url-del-repositorio>
+cd Lab4-Rest
+cp .env.example .env
+docker-compose up --build
 ```
 
-`RESOURCE` debe coincidir exactamente con el nombre que usaste en las rutas de tu API.
+Un único comando levanta los tres servicios: base de datos, API y frontend.
+
+| Servicio | URL |
+|---|---|
+| Frontend | http://localhost:8088 |
+| API | http://localhost:8080/cars |
 
 ---
 
-## Entrega
+## Variables de entorno
 
-- Repositorio en GitHub con visibilidad pública
-- El sistema levanta con un único comando
+Copia `.env.example` a `.env` y completa los valores:
+
+```env
+DB_HOST=postgres
+DB_PORT=5432
+DB_NAME=carsdb
+DB_USER=carsuser
+DB_PASSWORD=carspassword
+APP_PORT=8080
+```
+
+> `.env` está en `.gitignore` y nunca debe subirse al repositorio. Solo `.env.example` se versiona.
+
+---
+
+## Estructura del proyecto
+
+```
+Lab4-Rest/
+├── api/
+│   ├── db.js          # Pool de conexión a PostgreSQL
+│   ├── routes.js      # Endpoints con validaciones
+│   ├── server.js      # Punto de entrada
+│   ├── package.json
+│   └── Dockerfile
+├── db/
+│   └── init.sql       # Schema ejecutado automáticamente al primer arranque
+├── frontend/          # Frontend estático servido por Nginx
+├── .env               # Variables reales (no versionado)
+├── .env.example       # Plantilla de variables (versionado)
+├── .gitignore
+└── docker-compose.yml
+```
+
+---
+
+## Recurso: `/cars`
+
+| Campo | Tipo JSON | Tipo SQL | Descripción |
+|---|---|---|---|
+| `id` | integer | SERIAL PK | Identificador autoincremental |
+| `campo1` | string | VARCHAR(255) | Nombre del corredor |
+| `campo2` | string | VARCHAR(255) | Color del carro |
+| `campo3` | string | VARCHAR(255) | Número del carro |
+| `campo4` | integer | INTEGER | Año del modelo |
+| `campo5` | float | NUMERIC(10,2) | Velocidad máxima (mph) |
+| `campo6` | boolean | BOOLEAN | ¿Compite actualmente? |
+
+---
+
+## Endpoints
+
+| Método | Ruta | Descripción | Código |
+|---|---|---|---|
+| GET | `/cars` | Obtener todos los registros | 200 |
+| GET | `/cars/:id` | Obtener un registro por ID | 200 |
+| POST | `/cars` | Crear un nuevo registro | 201 |
+| PUT | `/cars/:id` | Actualizar un registro completo | 200 |
+| DELETE | `/cars/:id` | Eliminar un registro | 204 |
+
+### Códigos de respuesta
+
+| Código | Cuándo ocurre |
+|---|---|
+| 200 OK | GET y PUT exitosos |
+| 201 Created | POST exitoso |
+| 204 No Content | DELETE exitoso |
+| 404 Not Found | ID no existe |
+| 422 Unprocessable | Validación fallida |
+| 500 Internal Error | Error inesperado en la base de datos |
+
+---
+
+## Ejemplos
+
+### Crear un registro
+
+```http
+POST http://localhost:8080/cars
+Content-Type: application/json
+
+{
+  "campo1": "Lightning McQueen",
+  "campo2": "Rojo",
+  "campo3": "95",
+  "campo4": 2006,
+  "campo5": 198.5,
+  "campo6": true
+}
+```
+
+**Respuesta — 201 Created**
+
+```json
+{
+  "id": 1,
+  "campo1": "Lightning McQueen",
+  "campo2": "Rojo",
+  "campo3": "95",
+  "campo4": 2006,
+  "campo5": 198.5,
+  "campo6": true
+}
+```
+
+### Error de validación
+
+```json
+{
+  "errors": [
+    "campo4 es requerido y debe ser integer"
+  ]
+}
+```
+
+---
+
+## Validaciones
+
+Todos los campos son requeridos. Las reglas aplicadas antes de cualquier escritura:
+
+- `campo1`, `campo2`, `campo3` — strings no vacíos
+- `campo4` — número entero
+- `campo5` — número decimal
+- `campo6` — estrictamente `true` o `false`
+
+Si alguna falla, la API responde `422` con un array de errores. No se ejecuta ningún query.
+
+---
+
+## Infraestructura Docker
+
+El `docker-compose.yml` orquesta tres servicios:
+
+**postgres**
+- Imagen `postgres:16-alpine`
+- Credenciales inyectadas desde variables de entorno, sin valores hardcodeados
+- `init.sql` montado en `/docker-entrypoint-initdb.d/` — crea la tabla automáticamente al primer arranque
+- Volumen nombrado `postgres_data` para persistencia entre reinicios
+- Healthcheck con `pg_isready` cada 5 segundos
+
+**api**
+- Construida desde `api/Dockerfile` con `node:20-alpine`
+- `depends_on` con `condition: service_healthy` — no arranca hasta que Postgres esté listo
+- Variables inyectadas con `env_file`
+
+**frontend**
+- Nginx sirviendo los archivos estáticos del frontend
+- Personalizado con nombres del dominio Cars en las etiquetas
+
+---
+
+## Detener el sistema
+
+```bash
+# Detener servicios
+docker-compose down
+
+# Detener y eliminar todos los datos
+docker-compose down -v
+```
+
+---
+
+## Nivel entregado
+
+**Nivel 2 — Mid** con ambos bonus completados.
+
+| Ítem | Puntos |
+|---|---|
+| Nivel 2 — Mid (PostgreSQL, docker-compose, variables de entorno, healthcheck) | hasta 85/100 |
+| Bonus integración full stack (frontend en docker-compose, un solo comando) | +10 |
+| Bonus personalización frontend (etiquetas en español con nombres del dominio) | +5 |
